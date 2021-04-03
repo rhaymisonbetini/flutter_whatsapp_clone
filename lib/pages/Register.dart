@@ -6,6 +6,44 @@ class Register extends StatefulWidget {
 }
 
 class _Register extends State<Register> {
+  TextEditingController _controllerName = TextEditingController();
+  TextEditingController _controllerEmail = TextEditingController();
+  TextEditingController _controllerPassword = TextEditingController();
+
+  _register() async {
+    bool validate = await this._validate();
+    if (validate) {
+      //register
+    }
+  }
+
+  _validate() {
+    String name = _controllerName.text;
+    String email = _controllerEmail.text;
+    String password = _controllerPassword.text;
+
+    if (name.isEmpty ||
+        email.isEmpty ||
+        !email.contains("@") ||
+        password.isEmpty) {
+      _callSnackBar();
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  _callSnackBar() {
+    final SnackBar snackBar = SnackBar(
+      content: Text(
+        'Ops! formulário inválido',
+        style: TextStyle(color: Colors.white, fontSize: 18),
+      ),
+      backgroundColor: Colors.redAccent,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +70,7 @@ class _Register extends State<Register> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
+                    controller: _controllerName,
                     keyboardType: TextInputType.text,
                     style: TextStyle(fontSize: 20),
                     decoration: InputDecoration(
@@ -48,6 +87,7 @@ class _Register extends State<Register> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
+                    controller: _controllerEmail,
                     autofocus: true,
                     keyboardType: TextInputType.emailAddress,
                     style: TextStyle(fontSize: 20),
@@ -63,8 +103,10 @@ class _Register extends State<Register> {
                   ),
                 ),
                 TextField(
+                  controller: _controllerPassword,
                   keyboardType: TextInputType.text,
                   style: TextStyle(fontSize: 20),
+                  obscureText: true,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                     hintText: "Senha",
@@ -79,7 +121,9 @@ class _Register extends State<Register> {
                   padding: EdgeInsets.only(top: 16, bottom: 10),
                   // ignore: deprecated_member_use
                   child: RaisedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _register();
+                    },
                     child: Text(
                       'Cadastre-se',
                       style: TextStyle(color: Colors.white, fontSize: 20),
