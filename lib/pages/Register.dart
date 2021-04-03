@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_whatsapp/pages/Register.dart';
 
-class Login extends StatefulWidget {
+class Register extends StatefulWidget {
   @override
-  _Login createState() => _Login();
+  _Register createState() => _Register();
 }
 
-class _Login extends State<Login> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _Register extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff075E54),
+      appBar: AppBar(
+        title: Text('cadastro'),
+        elevation: 0.0,
+      ),
       body: Container(
         padding: EdgeInsets.all(16),
         child: Center(
@@ -26,14 +24,31 @@ class _Login extends State<Login> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 32),
                   child: Image.asset(
-                    'assets/logo.png',
-                    width: 200,
-                    height: 150,
+                    'assets/usuario.png',
+                    width: 150,
+                    height: 100,
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(fontSize: 20),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      hintText: "Nome",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(32),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: TextField(
+                    autofocus: true,
                     keyboardType: TextInputType.emailAddress,
                     style: TextStyle(fontSize: 20),
                     decoration: InputDecoration(
@@ -66,7 +81,7 @@ class _Login extends State<Login> {
                   child: RaisedButton(
                     onPressed: () {},
                     child: Text(
-                      'Login',
+                      'Cadastre-se',
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                     color: Colors.green,
@@ -75,22 +90,6 @@ class _Login extends State<Login> {
                         borderRadius: BorderRadius.circular(32)),
                   ),
                 ),
-                Center(
-                  child: GestureDetector(
-                    child: Text(
-                      'Não possui conta? Cadastre-se!',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Register(),
-                        ),
-                      );
-                    },
-                  ),
-                )
               ],
             ),
           ),
