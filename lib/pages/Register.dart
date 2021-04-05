@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_whatsapp/models/User.dart';
+import 'package:flutter_whatsapp/pages/Login.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -10,11 +16,53 @@ class _Register extends State<Register> {
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerPassword = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   _register() async {
     bool validate = await this._validate();
     if (validate) {
-      //register
+      await EasyLoading.show(
+        status: 'Cadastrando usuário...',
+        maskType: EasyLoadingMaskType.custom,
+      );
+
+      User user = User();
+      user.name = _controllerName.text;
+      user.email = _controllerEmail.text;
+      user.password = _controllerPassword.text;
+
+      FirebaseAuth auth = FirebaseAuth.instance;
+      auth
+          .createUserWithEmailAndPassword(
+              email: user.email, password: user.password)
+          .then(
+        (FirebaseUser firebaseUser) async {
+          _callSuccessSnackBar('Usuário cadastrado com sucesso!');
+          await _createUser(firebaseUser, user);
+          _clearForm();
+          EasyLoading.dismiss();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Login(),
+            ),
+          );
+        },
+      ).catchError(
+        (error) => {
+          _callSnackBar('Ops! algo inesperado aconteceu!'),
+        },
+      );
     }
+  }
+
+  _createUser(FirebaseUser firebaseUser, User user) async {
+    Firestore db = Firestore.instance;
+    db.collection('usuarios').document(firebaseUser.uid).setData(user.toMap());
+    return;
   }
 
   _validate() {
@@ -26,20 +74,37 @@ class _Register extends State<Register> {
         email.isEmpty ||
         !email.contains("@") ||
         password.isEmpty) {
-      _callSnackBar();
+      _callSnackBar('Ops! formulário inválido!');
       return false;
     } else {
       return true;
     }
   }
 
-  _callSnackBar() {
+  _clearForm() {
+    _controllerName.text = null;
+    _controllerEmail.text = null;
+    _controllerPassword.text = null;
+  }
+
+  _callSnackBar(String erroMesage) {
     final SnackBar snackBar = SnackBar(
       content: Text(
-        'Ops! formulário inválido',
+        erroMesage,
         style: TextStyle(color: Colors.white, fontSize: 18),
       ),
       backgroundColor: Colors.redAccent,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  _callSuccessSnackBar(String erroMesage) {
+    final SnackBar snackBar = SnackBar(
+      content: Text(
+        erroMesage,
+        style: TextStyle(color: Colors.white, fontSize: 18),
+      ),
+      backgroundColor: Colors.green,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }

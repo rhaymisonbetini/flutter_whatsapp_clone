@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_whatsapp/pages/Register.dart';
+import 'package:flutter_whatsapp/pages/autenticated/Home.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -7,9 +9,75 @@ class Login extends StatefulWidget {
 }
 
 class _Login extends State<Login> {
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    _verifyLogedUser();
+  }
+
+  Future _verifyLogedUser() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser logedUser = await auth.currentUser();
+    if (logedUser != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(),
+        ),
+      );
+    }
+  }
+
+  Future _onLogin() async {
+    bool validator = await _validator();
+    if (validator) {
+      FirebaseAuth auth = FirebaseAuth.instance;
+      auth
+          .signInWithEmailAndPassword(
+              email: _emailController.text, password: _passwordController.text)
+          .then(
+            (value) => {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Home(),
+                ),
+              )
+            },
+          )
+          .catchError(
+            // ignore: return_of_invalid_type_from_catch_error
+            (error) => {
+              _callSnackBar('Erro ao realizar o login'),
+            },
+          );
+    }
+  }
+
+  _validator() {
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    if (email.isEmpty || !email.contains('@') || password.isEmpty) {
+      _callSnackBar('Ops! Email ou senha inválidos!');
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  _callSnackBar(String erroMesage) {
+    final SnackBar snackBar = SnackBar(
+      content: Text(
+        erroMesage,
+        style: TextStyle(color: Colors.white, fontSize: 18),
+      ),
+      backgroundColor: Colors.redAccent,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -35,6 +103,7 @@ class _Login extends State<Login> {
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
                     keyboardType: TextInputType.emailAddress,
+                    controller: _emailController,
                     style: TextStyle(fontSize: 20),
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
@@ -49,6 +118,8 @@ class _Login extends State<Login> {
                 ),
                 TextField(
                   keyboardType: TextInputType.text,
+                  controller: _passwordController,
+                  obscureText: true,
                   style: TextStyle(fontSize: 20),
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
@@ -64,7 +135,9 @@ class _Login extends State<Login> {
                   padding: EdgeInsets.only(top: 16, bottom: 10),
                   // ignore: deprecated_member_use
                   child: RaisedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _onLogin();
+                    },
                     child: Text(
                       'Login',
                       style: TextStyle(color: Colors.white, fontSize: 20),
