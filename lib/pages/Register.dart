@@ -26,7 +26,7 @@ class _Register extends State<Register> {
     if (validate) {
       await EasyLoading.show(
         status: 'Cadastrando usuário...',
-        maskType: EasyLoadingMaskType.custom,
+        maskType: EasyLoadingMaskType.clear,
       );
 
       User user = User();
