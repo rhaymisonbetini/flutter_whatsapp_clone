@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_whatsapp/pages/Register.dart';
-import 'package:flutter_whatsapp/pages/autenticated/Home.dart';
+import 'package:flutter_whatsapp/Routes.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -22,12 +21,7 @@ class _Login extends State<Login> {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseUser logedUser = await auth.currentUser();
     if (logedUser != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Home(),
-        ),
-      );
+      Navigator.pushReplacementNamed(context, Routers.ROUTE_HOME);
     }
   }
 
@@ -39,14 +33,8 @@ class _Login extends State<Login> {
           .signInWithEmailAndPassword(
               email: _emailController.text, password: _passwordController.text)
           .then(
-            (value) => {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Home(),
-                ),
-              )
-            },
+            (value) =>
+                {Navigator.pushReplacementNamed(context, Routers.ROUTE_HOME)},
           )
           .catchError(
             // ignore: return_of_invalid_type_from_catch_error
@@ -155,12 +143,7 @@ class _Login extends State<Login> {
                       style: TextStyle(color: Colors.white),
                     ),
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Register(),
-                        ),
-                      );
+                      Navigator.pushNamed(context, Routers.ROUTE_RISTER);
                     },
                   ),
                 )

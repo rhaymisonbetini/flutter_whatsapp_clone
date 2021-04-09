@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_whatsapp/Routes.dart';
 import 'package:flutter_whatsapp/models/User.dart';
-import 'package:flutter_whatsapp/pages/Login.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -44,12 +44,8 @@ class _Register extends State<Register> {
           await _createUser(firebaseUser, user);
           _clearForm();
           EasyLoading.dismiss();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Login(),
-            ),
-          );
+          Navigator.pushNamedAndRemoveUntil(
+              context, Routers.ROUTE_LOGIN, (_) => false);
         },
       ).catchError(
         (error) => {

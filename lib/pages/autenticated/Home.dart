@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_whatsapp/pages/Login.dart';
+import 'package:flutter_whatsapp/Routes.dart';
 import 'package:flutter_whatsapp/pages/widgets/Contacts.dart';
 import 'package:flutter_whatsapp/pages/widgets/Talks.dart';
 
@@ -45,12 +45,7 @@ class _Home extends State<Home> with SingleTickerProviderStateMixin {
   _logout() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     await auth.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Login(),
-      ),
-    );
+    Navigator.pushReplacementNamed(context, Routers.ROUTE_LOGIN);
   }
 
   @override
