@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -9,9 +12,35 @@ class Configurations extends StatefulWidget {
 
 class _Configurations extends State<Configurations> {
   TextEditingController _controllerName = TextEditingController();
+  File _imagem;
+  bool _uploadFile = false;
+  String urlRecovered;
+  String _idLoged;
+
+  @override
+  void initState() {
+    super.initState();
+    _recoverDatas();
+  }
+
+  _recoverDatas() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser loged = await auth.currentUser();
+
+    Firestore db = Firestore.instance;
+    DocumentSnapshot snapshot =
+        await db.collection('usuarios').document(loged.uid).get();
+
+    Map<String, dynamic> dados = snapshot.data;
+
+    setState(() {
+      _idLoged = loged.uid;
+      urlRecovered = dados['urlImage'];
+      _controllerName.text = dados['name'];
+    });
+  }
 
   Future _getImage(String origim) async {
-    File _imagem;
     File selectedImage;
 
     switch (origim) {
@@ -30,7 +59,49 @@ class _Configurations extends State<Configurations> {
 
     setState(() {
       _imagem = selectedImage;
+      if (_imagem != null) {
+        _uploadImage();
+      }
     });
+  }
+
+  Future _uploadImage() async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    StorageReference path = storage.ref();
+    var child = path.child('perfil');
+    StorageReference file = child.child(_idLoged + '.jpg');
+
+    StorageUploadTask task = file.putFile(_imagem);
+
+    task.events.listen(
+      (StorageTaskEvent storageTaskEvent) {
+        if (storageTaskEvent.type == StorageTaskEventType.progress) {
+          setState(() {
+            _uploadFile = true;
+          });
+        }
+      },
+    );
+    task.onComplete.then(
+      (StorageTaskSnapshot storageTaskSnapshot) {
+        _recoverUrlImage(storageTaskSnapshot);
+      },
+    );
+  }
+
+  Future _recoverUrlImage(StorageTaskSnapshot storageTaskSnapshot) async {
+    String url = await storageTaskSnapshot.ref.getDownloadURL();
+    _updateFireStore(url);
+    setState(() {
+      urlRecovered = url;
+      _uploadFile = false;
+    });
+  }
+
+  _updateFireStore(String url) {
+    Firestore db = Firestore.instance;
+    Map<String, dynamic> dados = {"urlImage": url};
+    db.collection('usuarios').document(_idLoged).updateData(dados);
   }
 
   _register() {}
@@ -48,10 +119,15 @@ class _Configurations extends State<Configurations> {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                CircleAvatar(
-                  radius: 100,
-                  backgroundColor: Colors.grey,
-                ),
+                _uploadFile
+                    ? CircularProgressIndicator()
+                    : CircleAvatar(
+                        radius: 100,
+                        backgroundColor: Colors.grey,
+                        backgroundImage: urlRecovered != null
+                            ? NetworkImage(urlRecovered)
+                            : null,
+                      ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
