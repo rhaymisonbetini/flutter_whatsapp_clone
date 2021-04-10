@@ -32,6 +32,7 @@ class _Home extends State<Home> with SingleTickerProviderStateMixin {
   _choiceMenu(String choice) {
     switch (choice) {
       case 'Configurações':
+        Navigator.pushNamed(context, Routers.ROUTE_CONFIG);
         break;
 
       case 'Sair':
