@@ -104,7 +104,11 @@ class _Configurations extends State<Configurations> {
     db.collection('usuarios').document(_idLoged).updateData(dados);
   }
 
-  _register() {}
+  _register() {
+    Firestore db = Firestore.instance;
+    Map<String, dynamic> dados = {"name": _controllerName.text};
+    db.collection('usuarios').document(_idLoged).updateData(dados);
+  }
 
   @override
   Widget build(BuildContext context) {
