@@ -2,6 +2,7 @@ class User {
   String _name;
   String _email;
   String _password;
+  String _urlImage;
 
   User();
 
@@ -32,5 +33,13 @@ class User {
   // ignore: unnecessary_getters_setters
   set password(String value) {
     _password = value;
+  }
+
+  // ignore: unnecessary_getters_setters
+  String get urlImage => _urlImage;
+
+  // ignore: unnecessary_getters_setters
+  set urlImage(String value) {
+    _urlImage = value;
   }
 }
