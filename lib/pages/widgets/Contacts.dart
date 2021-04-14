@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_whatsapp/Routes.dart';
 import 'package:flutter_whatsapp/models/User.dart';
 
 class Contacts extends StatefulWidget {
@@ -56,6 +57,10 @@ class _Contacts extends State<Contacts> {
                 List<User> lUser = snapshot.data;
                 User user = lUser[index];
                 return ListTile(
+                  onTap: () {
+                    Navigator.pushNamed(context, Routers.ROUTE_MSG,
+                        arguments: user);
+                  },
                   contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                   leading: CircleAvatar(
                     maxRadius: 30,
