@@ -12,6 +12,18 @@ class Mesage extends StatefulWidget {
 class _Mesage extends State<Mesage> {
   TextEditingController _message = TextEditingController();
 
+  List<String> messages = [
+    "Fala Charlie Brow",
+    "Fala Marujo",
+    "Fala Marujo",
+    "Fala Marujo",
+    "Fala Marujo",
+    "Fala Marujo",
+    "Fala Marujo",
+    "Fala Marujo",
+    "Fala Marujo"
+  ];
+
   _sendMessage() {}
 
   _sendPicture() {}
@@ -64,6 +76,45 @@ class _Mesage extends State<Mesage> {
         ],
       ),
     );
+
+    var listMsg = Expanded(
+      child: ListView.builder(
+        itemCount: messages.length,
+        itemBuilder: (context, index) {
+          var msg = messages[index];
+
+          double sizeX = MediaQuery.of(context).size.width;
+          sizeX = sizeX * 0.8;
+
+          Alignment alignment = Alignment.centerRight;
+          Color color = Color(0xffd2ffa5);
+
+          if (index % 2 == 0) {
+            alignment = Alignment.centerLeft;
+            color = Colors.white;
+          }
+
+          return Align(
+            alignment: alignment,
+            child: Padding(
+              padding: EdgeInsets.all(6),
+              child: Container(
+                width: sizeX,
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(8),
+                  ),
+                ),
+                child: Text(msg),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60),
@@ -109,7 +160,7 @@ class _Mesage extends State<Mesage> {
             child: Container(
           padding: EdgeInsets.all(8),
           child: Column(
-            children: <Widget>[boxMessage],
+            children: <Widget>[listMsg, boxMessage],
           ),
         )),
       ),
