@@ -25,21 +25,21 @@ class _Talks extends State<Talks> {
     return ListView.builder(
       itemCount: talks.length,
       itemBuilder: (context, index) {
-        Talk talk = talks[index];
+        Talk tal = talks[index];
 
         return ListTile(
           contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
           leading: CircleAvatar(
             maxRadius: 30,
             backgroundColor: Colors.grey,
-            backgroundImage: NetworkImage(talk.photo),
+            backgroundImage: NetworkImage(tal.photo),
           ),
           title: Text(
-            talk.name,
+            tal.name,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           subtitle: Text(
-            talk.message,
+            tal.mensage,
             style: TextStyle(color: Colors.grey, fontSize: 14),
           ),
         );

@@ -22,7 +22,7 @@ class _Contacts extends State<Contacts> {
         user.email = dados["email"];
         user.name = dados["name"];
         user.urlImage = dados["urlImage"];
-        print(dados);
+        user.idUser = item.documentID;
 
         userList.add(user);
       }
