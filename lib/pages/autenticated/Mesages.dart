@@ -19,19 +19,13 @@ class _Mesage extends State<Mesage> {
     _currentUser();
   }
 
+  Firestore db = Firestore.instance;
   TextEditingController _message = TextEditingController();
   String uid = '';
 
   List<String> messages = [
     "Fala Charlie Brow",
     "Fala Marujo",
-    "Fala Marujo",
-    "Fala Marujo",
-    "Fala Marujo",
-    "Fala Marujo",
-    "Fala Marujo",
-    "Fala Marujo",
-    "Fala Marujo"
   ];
 
   _currentUser() async {
@@ -55,10 +49,8 @@ class _Mesage extends State<Mesage> {
 
   _sendPicture() {}
 
-  _saveMesage(Mensage mesage) {
-    Firestore db = Firestore.instance;
-
-    db
+  _saveMesage(Mensage mesage) async {
+    await db
         .collection('mensages')
         .document(uid)
         .collection(widget.contact.idUser)
@@ -116,42 +108,72 @@ class _Mesage extends State<Mesage> {
       ),
     );
 
-    var listMsg = Expanded(
-      child: ListView.builder(
-        itemCount: messages.length,
-        itemBuilder: (context, index) {
-          var msg = messages[index];
-
-          double sizeX = MediaQuery.of(context).size.width;
-          sizeX = sizeX * 0.8;
-
-          Alignment alignment = Alignment.centerRight;
-          Color color = Color(0xffd2ffa5);
-
-          if (index % 2 == 0) {
-            alignment = Alignment.centerLeft;
-            color = Colors.white;
-          }
-
-          return Align(
-            alignment: alignment,
-            child: Padding(
-              padding: EdgeInsets.all(6),
-              child: Container(
-                width: sizeX,
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(8),
-                  ),
-                ),
-                child: Text(msg),
+    var stream = StreamBuilder(
+      stream: db
+          .collection('mensages')
+          .document(uid)
+          .collection(widget.contact.idUser)
+          .snapshots(),
+      // ignore: missing_return
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return Center(
+              child: Column(
+                children: [CircularProgressIndicator()],
               ),
-            ),
-          );
-        },
-      ),
+            );
+            break;
+          case ConnectionState.done:
+            QuerySnapshot querySnapshot = snapshot.data;
+            if (snapshot.hasError) {
+              return Expanded(child: Text('Erro ao caregar dados'));
+            } else {
+              return Expanded(
+                child: ListView.builder(
+                  itemCount: querySnapshot.documents.length,
+                  itemBuilder: (context, index) {
+                    List<DocumentSnapshot> mesages =
+                        querySnapshot.documents.toList();
+                    DocumentSnapshot msg = mesages[index];
+
+                    double sizeX = MediaQuery.of(context).size.width;
+                    sizeX = sizeX * 0.8;
+
+                    Alignment alignment = Alignment.centerRight;
+                    Color color = Color(0xffd2ffa5);
+
+                    if (uid != msg["idUser"]) {
+                      alignment = Alignment.centerLeft;
+                      color = Colors.white;
+                    }
+
+                    return Align(
+                      alignment: alignment,
+                      child: Padding(
+                        padding: EdgeInsets.all(6),
+                        child: Container(
+                          width: sizeX,
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                          ),
+                          child: Text(msg['mensage']),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }
+            break;
+        }
+      },
     );
 
     return Scaffold(
@@ -199,7 +221,7 @@ class _Mesage extends State<Mesage> {
             child: Container(
           padding: EdgeInsets.all(8),
           child: Column(
-            children: <Widget>[listMsg, boxMessage],
+            children: <Widget>[stream, boxMessage],
           ),
         )),
       ),
